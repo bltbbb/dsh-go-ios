@@ -117,6 +117,7 @@ ios-overlay/Podfile               iOS 15 + 关 bitcode + 关签名
 - **TrollStore 版本 / 系统版本**：官方文档给出的支持范围是 iOS 14.0 beta2 – 16.6.1、16.7 RC (20H18)、17.0（不同版本/芯片条件不同），新系统是否有新的 CoreTrust 通道以官方仓库为准；`deployment_target` 不要设得比设备系统还新。
 - **装好后重启就打不开**：TrollStore 需要持久化助手（persistence helper）在图标缓存重载后重新注册为系统 App，按 TrollStore 的引导装好 helper 再试。
 - **想开条件式 JIT**：`Runner.entitlements` 里已保留 `get-task-allow = true`，这是 TrollStore 2.0.12+ 显示 JIT 选项的前提；本项目用不到它，遇到调试需求再动。
+- **构建报 `NWPath has no member 'isUltraConstrained'`**：`connectivity_plus 7.3.2` 引用了 iOS 26.0 才引入的 `NWPath.isUltraConstrained`（`#available(iOS 26.0, *)` 保护），而 GitHub 的 macOS runner 只提供到 iOS 18.x SDK，Swift 即便有可用性保护也要求 SDK 里存在该符号，于是报「no member」。`prepare.sh` / `build_ipa.sh` 已自动把该引用中和成 `false`（`.satellite` 连接类型本 App 用不到）；本地构建若用 iOS 26+ SDK 则无需此补丁。
 
 ---
 

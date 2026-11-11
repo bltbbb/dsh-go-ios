@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- TrollStore keeps arbitrary entitlements, but private com.apple.private.*
+	     keys are a common cause of instant launch crashes on newer iOS.
+	     Keep this file minimal; add keys only when a specific feature needs them. -->
+	<key>get-task-allow</key>
+	<true/>
+</dict>
+</plist>

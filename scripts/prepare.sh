@@ -115,6 +115,27 @@ log "flutter pub get"
 log "pod install (this may take a few minutes)"
 ( cd "$IOS_DIR" && pod install --repo-update )
 
+# ------------------------------------ 8b. fix connectivity_plus iOS 26 API
+# connectivity_plus 7.3.2 references NWPath.isUltraConstrained, an API introduced
+# in the iOS 26.0 SDK. The CI macOS runner only ships up to the iOS 18.x SDK, so
+# the Swift compiler cannot resolve the symbol (it is not declared in the SDK
+# headers) even though it is guarded by `#available(iOS 26.0, *)`. Neutralize the
+# reference so the app compiles; the .satellite connectivity type is unused here.
+log "neutralizing connectivity_plus iOS 26 API reference"
+CONN_FILE="$(find "${PUB_CACHE:-$HOME/.pub-cache}" \
+  -path '*connectivity_plus*/Sources/connectivity_plus/PathMonitorConnectivityProvider.swift' \
+  2>/dev/null | head -1 || true)"
+if [ -n "$CONN_FILE" ]; then
+  if grep -q 'isUltraConstrained' "$CONN_FILE"; then
+    sed -i.bak 's/path\.isUltraConstrained/false/' "$CONN_FILE"
+    log "  patched: $CONN_FILE"
+  else
+    log "  already patched: $CONN_FILE"
+  fi
+else
+  warn "connectivity_plus source not found in pub cache; skipping patch"
+fi
+
 mkdir -p "$OUT_DIR"
 cat > "$OUT_DIR/BUILD_INFO.txt" <<EOF
 upstream      : $UPSTREAM_REPO@$UPSTREAM_REF ($UPSTREAM_SHA)

@@ -20,6 +20,18 @@ for cfg in "$IOS_DIR/Flutter/Release.xcconfig" "$IOS_DIR/Flutter/Debug.xcconfig"
   fi
 done
 
+# ---------------------------------------------------------------- connectivity_plus iOS 26 API
+# See prepare.sh for context. Re-apply here in case pod install copied the plugin
+# source into Pods/ or the cache was refreshed.
+log "ensuring connectivity_plus iOS 26 API reference is neutralized"
+while IFS= read -r -d '' f; do
+  if grep -q 'isUltraConstrained' "$f" 2>/dev/null; then
+    sed -i.bak 's/path\.isUltraConstrained/false/' "$f"
+    log "  patched: $f"
+  fi
+done < <(find "${PUB_CACHE:-$HOME/.pub-cache}" "$IOS_DIR/Pods" \
+          -path '*PathMonitorConnectivityProvider.swift' -print0 2>/dev/null || true)
+
 log "flutter build ios --release --no-codesign"
 ( cd "$APP_DIR" && flutter build ios --release --no-codesign )
 

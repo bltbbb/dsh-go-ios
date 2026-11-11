@@ -10,6 +10,16 @@ require plutil
 
 [ -d "$IOS_DIR/Runner.xcodeproj" ] || die "iOS project missing; run scripts/prepare.sh first"
 
+# Fail-safe: Flutter refuses to build a deployable iOS app unless a Development
+# Team is configured, even with --no-codesign. Make sure a (dummy) team value is
+# present in the Xcode build configs. TrollStore re-signs on install and this
+# script ad-hoc signs, so the value is never used for real signing.
+for cfg in "$IOS_DIR/Flutter/Release.xcconfig" "$IOS_DIR/Flutter/Debug.xcconfig"; do
+  if [ -f "$cfg" ] && ! grep -q '^DEVELOPMENT_TEAM' "$cfg"; then
+    printf 'DEVELOPMENT_TEAM = 0000000000\n' >> "$cfg"
+  fi
+done
+
 log "flutter build ios --release --no-codesign"
 ( cd "$APP_DIR" && flutter build ios --release --no-codesign )
 

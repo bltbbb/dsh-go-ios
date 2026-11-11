@@ -27,6 +27,16 @@ src, n_target = re.subn(
     src,
 )
 
+# Development Team: Flutter refuses to build a "deployable" iOS app unless a
+# team is configured, even with CODE_SIGNING_ALLOWED=NO. We set a dummy team
+# (0000000000). TrollStore re-signs on install and build_ipa.sh ad-hoc signs,
+# so this value is never used for real code signing.
+src, n_team = re.subn(
+    r"DEVELOPMENT_TEAM\s*=\s*[^;]*;",
+    "DEVELOPMENT_TEAM = 0000000000;",
+    src,
+)
+
 # Append the extra build settings right after each bundle-id line, once per
 # configuration block. Do it line-wise so we don't disturb pbxproj formatting.
 extras = [
@@ -35,6 +45,7 @@ extras = [
     "CODE_SIGNING_REQUIRED = NO;",
     "ENABLE_BITCODE = NO;",
     "CODE_SIGN_IDENTITY = \"\";",
+    "DEVELOPMENT_TEAM = 0000000000;",
 ]
 
 out_lines = []
@@ -64,6 +75,7 @@ open(path, "w", encoding="utf-8").write("".join(out_lines))
 
 print(f"[pbxproj] bundle id replacements : {n_bundle}")
 print(f"[pbxproj] deployment target     : {n_target} -> {args.deployment_target}")
+print(f"[pbxproj] development team       : {n_team} -> 0000000000")
 if n_bundle == 0:
     print("[pbxproj] WARNING: no PRODUCT_BUNDLE_IDENTIFIER found", file=sys.stderr)
     sys.exit(1)

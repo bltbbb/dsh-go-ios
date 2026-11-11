@@ -51,15 +51,42 @@ jobs:
       - name: Checkout this repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode (must ship the iphoneos SDK)
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.2.app 2>/dev/null \
-            || sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | head -1)"
-          sudo xcodebuild -license accept
-          # Install the iOS device platform (iPhoneOS SDK) so device builds work.
-          sudo xcodebuild -runFirstLaunch || true
-          sudo xcodebuild -downloadPlatform iOS || true
+          set -e
+          sudo xcodebuild -license accept || true
+
+          # Pick the Xcode that actually bundles the iPhoneOS (device) SDK.
+          # GitHub's macos-15 image ships several Xcodes; some (e.g. the
+          # explicitly-versioned ones) may be missing the iOS platform, so we
+          # probe each one instead of hard-coding a path.
+          pick_xcode() {
+            for xc in /Applications/Xcode.app /Applications/Xcode_*.app; do
+              [ -d "$xc" ] || continue
+              sdk=$(DEVELOPER_DIR="$xc/Contents/Developer" \
+                    xcrun --sdk iphoneos --show-sdk-path 2>/dev/null || true)
+              if [ -n "$sdk" ] && [ -d "$sdk" ]; then
+                echo "Found iOS SDK in: $xc"
+                echo "  sdk path: $sdk"
+                sudo xcode-select -s "$xc"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          if ! pick_xcode; then
+            echo "No preinstalled iOS SDK found — downloading the platform..."
+            sudo xcodebuild -runFirstLaunch || true
+            sudo xcodebuild -downloadPlatform iOS
+            if ! pick_xcode; then
+              echo "FATAL: could not obtain an iOS SDK after download"
+              exit 1
+            fi
+          fi
+
           xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2

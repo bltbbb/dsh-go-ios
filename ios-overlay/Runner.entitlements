@@ -7,5 +7,20 @@
 	     Keep this file minimal; add keys only when a specific feature needs them. -->
 	<key>get-task-allow</key>
 	<true/>
+
+	<!-- Keychain access. flutter_secure_storage writes through the iOS data
+	     protection keychain, which needs an app identifier and a keychain
+	     access group; an ad-hoc signed bundle has neither, so every write
+	     failed with PlatformException(-34018, errSecMissingEntitlement) and
+	     DSH Remote sign-in stopped right after the Server accepted the
+	     password (identity could not be persisted). TrollStore preserves
+	     these keys when it re-signs the .ipa. The prefix only has to look
+	     like a team id and match between both keys; it is not a real team. -->
+	<key>application-identifier</key>
+	<string>DSHGOID001.io.github.lxsfful.dshgo.troll</string>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>DSHGOID001.io.github.lxsfful.dshgo.troll</string>
+	</array>
 </dict>
 </plist>

@@ -1,0 +1,11 @@
+name: runner-probe2
+on: workflow_dispatch
+jobs:
+  mac26:
+    runs-on: macos-26
+    steps:
+      - run: sw_vers
+  mac15:
+    runs-on: macos-15
+    steps:
+      - run: sw_vers

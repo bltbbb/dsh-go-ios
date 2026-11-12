@@ -33,6 +33,18 @@
 
 ---
 
+## 一·五、直接下载（已构建好的 .ipa）
+
+不想自己跑流水线，可以直接下载已构建并通过 TrollStore 验证的 .ipa：
+
+- **下载地址**：[`DSH-Go-TrollStore.ipa`](https://github.com/fushanhuang/dsh-go-ios/releases/download/v1.0/DSH-Go-TrollStore.ipa)（Release `v1.0`，约 27.3 MB）
+- **SHA-256**：`ac7c24cef78514fc88f678572b70edcb1bd26f6677415bfd5745a05a1dce3083`
+- **安装**：把 .ipa 存到 iPhone 的「文件」App → 分享给 **TrollStore** → 安装。无需开发者账号、无需 7 天重签。
+
+> 该包是免签名 / ad-hoc 签名产物，由 TrollStore 用 CoreTrust 通道重签并永久注册。本机引擎（Ubuntu+Node）在 iOS 上不可用，请走「远程连接」。
+
+---
+
 ## 二、三步出 .ipa
 
 ### 1. 把本目录上传成一个 GitHub 仓库

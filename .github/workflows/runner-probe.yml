@@ -1,7 +1,7 @@
-name: Runner probe
+name: runner-probe
 on: workflow_dispatch
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "hosted runner ok: $(uname -a)"
+      - run: echo hosted-runner-ok

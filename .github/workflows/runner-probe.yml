@@ -1,7 +1,11 @@
 name: runner-probe
 on: workflow_dispatch
 jobs:
-  probe:
-    runs-on: ubuntu-latest
+  mac14:
+    runs-on: macos-14
     steps:
-      - run: echo hosted-runner-ok
+      - run: sw_vers && xcodebuild -version
+  mac15:
+    runs-on: macos-15
+    steps:
+      - run: sw_vers && xcodebuild -version
